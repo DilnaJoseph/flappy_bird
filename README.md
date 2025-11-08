@@ -1,0 +1,1 @@
+FlappyWeb is a simple clone of the popular game Flappy Bird built with HTML5 Canvas and vanilla JavaScript, demonstrating core game mechanics like gravity, physics, and object management for pipes.
