@@ -31,7 +31,7 @@ const bird = new Bird(
     40, // width
     30, // height
     () => currentState, // function to dynamically get current state
-    gameState
+    gameState,
     'assets/images/flappy-bird.png' // imagePath
 );
 
@@ -50,6 +50,7 @@ window.addEventListener('keydown',(e)=>{
              bird.velocity = 2;
              score = 0;
              currentState = gameState.ready;
+            bird.rotation = 0;
         }
     }
 });
