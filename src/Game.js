@@ -81,13 +81,21 @@ function drawCenteredText(text, size) {
 }
 
 function drawStartScreen(){
-    drawCeneteredText("Press SPACE to begin the game",50);
-};
+    drawCenteredText("Press SPACE to begin the game",50);
+}
 
 function drawGameOverScreen(){
-    drawCeneteredText("GAME OVER",60);
+    drawCenteredText("GAME OVER",60);
     ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 60);
     ctx.fillText("Press SPACE to restart the game", canvas.width / 2, canvas.height / 2 + 120);
+}
+
+
+function drawScore(){
+    ctx.fillStyle = "white";
+    ctx.font = "60px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(score, canvas.width / 2, 100);
 }
 // --- GAME LOOP ---
 
@@ -107,6 +115,7 @@ function gameloop() {
             // currently playing
             bird.update();
             bird.draw(ctx);
+            drawScore();
             // pipes score etc
             break;
 
