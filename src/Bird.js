@@ -30,16 +30,23 @@ export class Bird {
         ctx.fillStyle = this.color;
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
+        ctx.closePath();
+
+        // Rotation
+        ctx.save();
+        ctx.translate(this.x,this.y);
+        let angle = this.velocity*0.05;
+        ctx.rotate(angle);
         
         // Draw the image, centered on bird.x, bird.y
         ctx.drawImage(
             this.image, 
-            this.x - this.width / 2, 
-            this.y - this.height / 2, 
+            -this.width / 2, 
+            -this.height / 2, 
             this.width, 
             this.height
         );
-        ctx.closePath();
+        ctx.restore();
     }
 
     // Handles the flap action (setting initial negative velocity)
