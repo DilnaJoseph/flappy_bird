@@ -2,7 +2,7 @@
 
 // Define bird properties using a class for better structure
 export class Bird {
-    constructor(x, y, radius, color, width, height, imagePath) {
+    constructor(x, y, radius, color, width, height, getCurrentState, gameState, imagePath) {
         this.x = x;
         this.y = y;
         this.radius = radius;
@@ -11,6 +11,9 @@ export class Bird {
         this.height = height;
         this.velocity = 2; // Initial fall velocity
         this.space = false; // Tracks spacebar state
+
+        this.getCurrentState = getCurrentState; // Function to get current state
+        this.gameState = gameState;
 
         // Load image asset
         this.image = new Image();
@@ -42,7 +45,7 @@ export class Bird {
     // Handles the flap action (setting initial negative velocity)
     flap() {
         window.addEventListener('keydown', (event) => {
-            if (event.code === 'Space') {
+            if (event.code === 'Space' && this.getCurrentState() === this.gameState.start) {
                 this.space = true;
             }
         });
