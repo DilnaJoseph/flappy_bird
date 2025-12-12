@@ -72,17 +72,6 @@ function initialDraw() {
     // NOTE: We don't need to update bird.y here unless we want to reset it explicitly
 }
 
-function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    // Redraw the background immediately after resize
-    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-    // Update bird's starting Y if canvas height changed drastically
-    if (bird) { 
-        bird.y = canvas.height / 2;
-    }
-}
-
 // Initial setup and handling resize
 backgroundImage.onload = function () {
     initialDraw();
@@ -90,26 +79,25 @@ backgroundImage.onload = function () {
 }
 
 // functions for different screens
-function drawCenteredText(text, size) {
+function drawCenteredText(text, size,offsetY = 0) {
     ctx.fillStyle = "white";
     ctx.font = `${size}px Arial`;
     ctx.textAlign = "center";
-    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+    ctx.textBaseline = "middle"; // center vertically
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2 + offsetY);
 }
 
 function drawStartScreen(){
-    drawCenteredText("Press SPACE to begin the game",50);
+    drawCenteredText("Press SPACE to begin the game",32);
 }
 
 function drawGameOverScreen(){
     const finalScore = getScore(); // <-- Get the score from the Pipes module
     
-    drawCenteredText("GAME OVER",60);
+    drawCenteredText("GAME OVER",48,-40);
     
-    // FIX REQUIRED: Change 'score' to 'finalScore'
-    ctx.fillText(`Score: ${finalScore}`, canvas.width / 2, canvas.height / 2 + 60); 
-    
-    ctx.fillText("Press SPACE to restart the game", canvas.width / 2, canvas.height / 2 + 120);
+    drawCenteredText(`Score: ${finalScore}`, 32, 10);
+    drawCenteredText("Press SPACE to restart", 28, 60);
 }
 
 
@@ -117,9 +105,9 @@ function drawScore(){
     const currentScore = getScore();
     ctx.fillStyle = "white";
     ctx.font = "40px Arial";
-    ctx.textAlign = "left";
-    ctx.textBaseline = "top";
-    ctx.fillText(currentScore, 10, 10);
+    ctx.textAlign = "left"; // align from left
+    ctx.textBaseline = "top"; // align from top
+    ctx.fillText(`Score: ${currentScore}`, 10, 10);
 }
 // --- GAME LOOP ---
 
@@ -155,16 +143,6 @@ function gameloop() {
             drawGameOverScreen();
             break;       
     }
-
-    /*
-    // 2. UPDATE GAME OBJECTS (Physics/Movement)
-    bird.update(); // Update the bird's position
-
-    // 3. DRAW GAME OBJECTS
-    bird.draw(ctx); // Draw the bird using the context
-    */
-    
-    // 4. LOOP
     requestAnimationFrame(gameloop);
 }
 
