@@ -49,8 +49,8 @@ window.addEventListener('keydown',(e)=>{
              bird.y = canvas.height/2;
              bird.velocity = 2;
              resetScore(); 
-             currentState = gameState.ready;
             bird.rotation = 0;
+            currentState = gameState.playing;
         }
     }
 });
