@@ -116,9 +116,10 @@ function drawGameOverScreen(){
 function drawScore(){
     const currentScore = getScore();
     ctx.fillStyle = "white";
-    ctx.font = "60px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(currentScore, canvas.width / 2, 100);
+    ctx.font = "40px Arial";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText(currentScore, 10, 10);
 }
 // --- GAME LOOP ---
 
