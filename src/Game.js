@@ -2,7 +2,7 @@
 
 // ---------------- IMPORTS ----------------
 import { Bird } from './Bird.js';
-import { updatePipes, getScore, pipeWidth, pipeGap, getPipes, resetScore } from './Pipes.js';
+import { updatePipes, getScore, pipeWidth, pipeGap, getPipes, resetScore, resetPipes } from './Pipes.js';
 import { isColliding } from './utils.js';
 
 // ---------------- GAME STATES ----------------
