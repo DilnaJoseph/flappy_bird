@@ -2,7 +2,7 @@
 
 // ---------------- IMPORTS ----------------
 import { Bird } from './Bird.js';
-import { updatePipes, getScore, pipeWidth, pipeGap, getPipes } from './Pipes.js';
+import { updatePipes, getScore, pipeWidth, pipeGap, getPipes, resetScore } from './Pipes.js';
 import { isColliding } from './utils.js';
 
 // ---------------- GAME STATES ----------------
@@ -48,7 +48,7 @@ window.addEventListener('keydown',(e)=>{
         else if(currentState === gameState.game_over){
              bird.y = canvas.height/2;
              bird.velocity = 2;
-             score = 0;
+             resetScore(); 
              currentState = gameState.ready;
             bird.rotation = 0;
         }
