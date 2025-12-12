@@ -75,17 +75,23 @@ backgroundImage.onload = function () {
 
 // functions for different screens
 function drawCenteredText(text, size,offsetY = 0) {
-    ctx.fillStyle = "white";
-    ctx.font = `${size}px Arial`;
+     ctx.font = `${size}px Arial`;
     ctx.textAlign = "center";
-    ctx.textBaseline = "middle"; // center vertically
+    ctx.textBaseline = "middle";
+
+    // Outline (makes text readable on any background)
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 4;
+    ctx.strokeText(text, canvas.width / 2, canvas.height / 2 + offsetY);
+
+    // White fill
+    ctx.fillStyle = "white";
     ctx.fillText(text, canvas.width / 2, canvas.height / 2 + offsetY);
 }
 
 // "Press SPACE to start" screen
 function drawStartScreen(){
-    drawCenteredText("Press SPACE", 32, -20);
-    drawCenteredText("to start", 32, 20);
+    drawCenteredText("Press SPACE to begin the game", 32);
 }
 
 // Game Over screen
