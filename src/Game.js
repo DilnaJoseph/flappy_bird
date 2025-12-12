@@ -50,7 +50,7 @@ window.addEventListener('keydown',(e)=>{
              bird.velocity = 2;
              resetScore(); 
             bird.rotation = 0;
-            currentState = gameState.playing;
+            currentState = gameState.start;
         }
     }
 });
