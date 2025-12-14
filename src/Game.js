@@ -75,6 +75,33 @@ window.addEventListener('keydown',(e)=>{
     }
 });
 
+canvas.addEventListener('touchstart', (e) => {
+    // Prevent default browser actions (like scrolling or zooming)
+    e.preventDefault(); 
+    
+    // 1. If ready, start the game
+    if (currentState === gameState.ready) {
+        currentState = gameState.start;
+    } 
+    
+    // 2. If playing, flap the bird
+    else if (currentState === gameState.start) {
+        bird.triggerFlapAction();
+    }
+    
+    // 3. If game over, restart the game (Tapping to restart is intuitive on mobile)
+    else if (currentState === gameState.game_over) {
+        bird.y = canvas.height / 2;
+        bird.velocity = 2;
+        bird.rotation = 0;
+
+        isRestarting = true;
+        currentState = gameState.ready;
+
+        gameOverScreenXOffset = canvas.width / 2; // Reset off-screen
+        gameOverFloatOffset = 0;                  // Reset float
+    }
+});
 
 // --- WINDOW AND INITIAL DRAWING HANDLERS ---
 // The dimensions are now fixed by the HTML canvas attributes
