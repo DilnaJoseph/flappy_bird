@@ -13,6 +13,8 @@ const gameState = {
 };
 
 let currentState = gameState.ready;
+let isRestarting = false;
+let hasNewHighScore = false;
 
 // Load High Score from browser storage, default to 0 if none is found
 let highScore = localStorage.getItem('flappyHighScore') || 0; // <-- ADD THIS LINE
@@ -22,6 +24,15 @@ highScore = Number(highScore);
 // ---------------- INITIALIZATION ----------------
 const canvas = document.getElementById('canvas'); // getting canva element
 const ctx = canvas.getContext('2d'); // 2D drawing context
+
+// --- NEW: Game Over Screen Animation Variables ---
+let gameOverScreenSpeed = 8;        // Speed of the slide-in animation
+let gameOverFloatOffset = 0;        // For the subtle floating effect
+let gameOverFloatSpeed = 0.003;     // Speed of the floating sine wave
+let gameOverFloatAmplitude = 3;     // How much it floats up/down
+
+let gameOverScreenXOffset = canvas.width / 2; // Start half a screen width to the right
+let gameOverScreenTargetOffset = 0;           // Target is 0 offset (centered)
 
 // setting background image
 const backgroundImage = new Image();
@@ -53,13 +64,17 @@ window.addEventListener('keydown',(e)=>{
         else if(currentState === gameState.game_over){
              bird.y = canvas.height/2;
              bird.velocity = 2;
-             resetScore(); 
             bird.rotation = 0;
-            resetPipes();
+
+            isRestarting = true;
             currentState = gameState.ready;
+
+            gameOverScreenXOffset = canvas.width / 2; // Reset off-screen
+            gameOverFloatOffset = 0;                  // Reset float
         }
     }
 });
+
 
 // --- WINDOW AND INITIAL DRAWING HANDLERS ---
 // The dimensions are now fixed by the HTML canvas attributes
@@ -81,7 +96,7 @@ backgroundImage.onload = function () {
 
 // functions for different screens
 function drawCenteredText(text, size,offsetY = 0) {
-     ctx.font = `${size}px Arial`;
+    ctx.font = `${size}px 'Press Start 2P', monospace`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
@@ -98,10 +113,10 @@ function drawCenteredText(text, size,offsetY = 0) {
 // "Press SPACE to start" screen
 function drawStartScreen(bird){ 
     // 1. Title
-    drawCenteredText("FLAPPY BIRD", 50, -120); // Move title up
+    drawCenteredText("FLAPPY BIRD", 28, -120); // Move title up
 
     // 2. High Score Status
-    ctx.font = "30px Arial";
+    ctx.font = "15px 'Press Start 2P', monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
@@ -127,44 +142,66 @@ function drawStartScreen(bird){
     bird.draw(ctx); 
 
     // 4. Instructions/Prompt (Tap to Flap)
-    drawCenteredText("TAP TO FLAP", 28, readyY - canvas.height / 2 + 60); // Centered relative to bird
+    drawCenteredText("TAP TO FLAP", 20, readyY - canvas.height / 2 + 60); // Centered relative to bird
     
     // 5. Start Prompt
-    drawCenteredText("Press SPACE to begin", 28, canvas.height / 2 - 50); // Moved to the bottom
+    drawCenteredText("Press SPACE to begin", 15, canvas.height / 2 - 50); // Moved to the bottom
 }
 
 // Game Over screen
 function drawGameOverScreen(){
     const finalScore = getScore(); 
     
-    // 1. Check and Save High Score
-    let isNewHighScore = false;
-    if (finalScore > highScore) {
-        highScore = finalScore;
-        localStorage.setItem('flappyHighScore', highScore);
-        isNewHighScore = true;
-    }
+    const oldHighScore = Number(highScore);
+
+    // 1. Check and Save High Score (this logic remains the same)
+    // --- NEW: Draw animated Game Over elements ---
+
+    // Use a custom pixel-like font. You might need to import one or just use a fallback.
+    // Example: 'Press Start 2P', monospace;
+    // For now, let's just make Arial bolder/larger.
+
+    // Calculate Y-offset due to floating
+    const currentYOffset = gameOverFloatOffset; 
+
+    // Helper to draw text for the animated screen
+    const drawAnimatedText = (text, size, relativeY) => {
+        ctx.font = `${size}px 'Press Start 2P', monospace`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // FIX: Change 'gameOverScreenX' to 'gameOverScreenXOffset'
+        const finalX = canvas.width / 2 + gameOverScreenXOffset; // Center of screen + Slide Offset
+        const finalY = canvas.height / 2 + relativeY + currentYOffset; // Center Y + Relative Y + Float Offset
+
+        // Outline (makes text readable on any background)
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 4;
+        ctx.strokeText(text, finalX, finalY);
+
+        // White fill
+        ctx.fillStyle = "white";
+        ctx.fillText(text, finalX, finalY);
+    };
+
+    // --- Draw the actual game over elements ---
+    drawAnimatedText("GAME OVER", 28, -80); // Title
     
-    // 2. Display UI
-    drawCenteredText("GAME OVER",42,-40);
-    
-    // Highlight if it's a new record
-    if(isNewHighScore) {
-        drawCenteredText(`NEW HIGH SCORE!`, 32, 10);
+    if(hasNewHighScore) {
+        drawAnimatedText(`NEW HIGH SCORE!`, 20, -20);
     } else {
-        drawCenteredText(`Score: ${finalScore}`, 32, 10);
+        drawAnimatedText(`Score: ${finalScore}`, 25, -20);
     }
 
-    // Display the best score below
-    drawCenteredText(`Best: ${highScore}`, 28, 60);
-    drawCenteredText("Press SPACE to restart", 24, 110);
+    drawAnimatedText(`Best: ${highScore}`, 25, 30);
+    drawAnimatedText("Press SPACE to restart", 14, 90);
 }
 
 // Show score while playing
 function drawScore(){
     const currentScore = getScore();
     ctx.fillStyle = "white";
-    ctx.font = "30px Arial";
+    ctx.font = "18px 'Press Start 2P', monospace";
     ctx.textAlign = "left"; // align from left
     ctx.textBaseline = "top"; // align from top
     ctx.fillText(`Score: ${currentScore}`, 10, 10);
@@ -179,6 +216,13 @@ function gameloop() {
     switch(currentState){
         case gameState.ready:
             // bird visible but stationary
+
+            if (isRestarting) {
+                resetScore(); 
+                resetPipes();
+                isRestarting = false; // Reset the flag
+                hasNewHighScore = false;
+            }
             bird.draw(ctx);
             drawStartScreen(bird);
             break;
@@ -192,6 +236,17 @@ function gameloop() {
 
             // Check collision between bird and pipes/ground
             if (isColliding(bird, getPipes(), canvas.height)) {
+                const finalScore = getScore();
+                const oldHighScore = Number(highScore);
+                
+                if (finalScore > oldHighScore) {
+                    highScore = finalScore;
+                    localStorage.setItem('flappyHighScore', highScore);
+                    hasNewHighScore = true; // <-- Cache the status!
+                } else {
+                    hasNewHighScore = false; // Important: Clear the status if not a new score
+                }
+
                 currentState = gameState.game_over;
             }
 
@@ -200,10 +255,23 @@ function gameloop() {
             break;
 
         case gameState.game_over:
-            // Bird stays where it crashed
             bird.draw(ctx);
-            drawGameOverScreen(); // Show GAME OVER UI
-            break;       
+            
+            // --- NEW: Game Over Animation Logic ---
+            // Slide in animation
+            if (gameOverScreenXOffset > gameOverScreenTargetOffset) {
+                gameOverScreenXOffset -= gameOverScreenSpeed;
+                if (gameOverScreenXOffset < gameOverScreenTargetOffset) { 
+                    gameOverScreenXOffset = gameOverScreenTargetOffset;
+                }
+            }
+
+            // Floating effect
+            gameOverFloatOffset = Math.sin(Date.now() * gameOverFloatSpeed) * gameOverFloatAmplitude;
+
+            // Show GAME OVER UI (now with animation variables)
+            drawGameOverScreen(); 
+            break;      
     }
     // Request next animation frame → loop never ends
     requestAnimationFrame(gameloop);
